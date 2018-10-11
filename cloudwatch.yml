@@ -1,0 +1,105 @@
+---
+- hosts: all
+  gather_facts: yes
+  become: true
+
+  pre_tasks:
+
+    #Distributions: Debian and Ubuntu
+    - name: Install zip
+      apt:
+        name: zip
+        state: latest
+      when:
+        - ansible_distribution == "Debian"
+        - ansible_distribution == "Ubuntu"
+
+    - name: Install unzip
+      apt:
+        name: unzip
+        state: latest
+      when:
+        - ansible_distribution == "Debian"
+        - ansible_distribution == "Ubuntu"
+
+    - name: Install wget
+      apt:
+        name: wget
+        state: latest
+      when:
+        - ansible_distribution == "Debian"
+        - ansible_distribution == "Ubuntu"
+
+    - name: Install libwww-perl
+      apt:
+        name: libwww-perl
+        state: latest
+      when:
+        - ansible_distribution == "Debian"
+        - ansible_distribution == "Ubuntu"
+
+    - name: Install libdatetime-perl
+      apt:
+        name: libdatetime-perl
+        state: latest
+      when:
+        - ansible_distribution == "Debian"
+        - ansible_distribution == "Ubuntu"
+
+    #Distributions: CentOS and Red Hat Enterprise Linux
+    - name: Install perl-core
+      yum: name=perl-core state=present
+      when:
+        - ansible_distribution == "CentOS"
+        - ansible_distribution == "RedHat"
+
+    - name: Install zip
+      yum: name=zip state=present
+      when:
+        - ansible_distribution == "CentOS"
+        - ansible_distribution == "RedHat"
+
+    - name: Install unzip
+      yum: name=unzip state=present
+      when:
+        - ansible_distribution == "CentOS"
+        - ansible_distribution == "RedHat"
+
+    - name: Install wget
+      yum: name=wget state=present
+      when:
+        - ansible_distribution == "CentOS"
+        - ansible_distribution == "RedHat"
+
+    #Distribution: Red Hat Enterprise Linux
+    - name: Install perl-DateTime
+      yum: name=perl-DateTime state=present
+      when:
+        - ansible_distribution == "RedHat"
+        - ansible_distribution_major_version == "7"
+
+    - name: Install Syslog
+      yum: name=perl-Sys-Syslog state=present
+      when:
+        - ansible_distribution == "RedHat"
+        - ansible_distribution_major_version == "7"
+
+    #Install CloudWatch Agent
+    - name: Create Folder
+      file:
+        path: /opt/credibilit/scripts
+        state: directory
+        mode: 0755
+
+    - name: Accessing Folder
+      shell: cd /opt/credibilit/scripts
+
+    - unarchive:
+      src: https://aws-cloudwatch.s3.amazonaws.com/downloads/CloudWatchMonitoringScripts-1.2.1.zip
+      dest: /opt/credibilit/scripts
+      remote_src: True
+
+    - name: Copy File Cron
+      copy:
+        src: ./cloudwatch_mon_cron
+        dest: /etc/cron.d/
